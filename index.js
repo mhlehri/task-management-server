@@ -46,7 +46,7 @@ const run = async () => {
       // console.log(result);
       res.send(result);
     });
-    // get tasks
+    //? get tasks
     app.get("/tasks", async (req, res) => {
       const email = req.query.email;
       console.log(email);
@@ -54,31 +54,42 @@ const run = async () => {
       res.send(result);
       console.log(result);
     });
+    //? get 1 tasks
+    app.get("/tasks/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const result = await Tasks.findOne({ _id: id });
+      res.send(result);
+      console.log(result);
+    });
 
-    try {
-      app.post("/addUser", async (req, res) => {
-        const user = req.body;
-        const userEmail = user.email;
-        const find = await Users.findOne({ email: userEmail });
-        if (find) {
-          return;
-        }
-        const userDoc = new Users(user);
-        const result = await userDoc.save();
-        res.send(result);
-      });
-    } catch (error) {
-      return console.log(error);
-    }
-
+    // ?
+    app.delete("/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await Tasks.deleteOne({ _id: id });
+      res.send(result);
+    });
+    // ? update tasks category
     app.put("/updateTask", async (req, res) => {
-      const email = req.query.email;
       const tasks = req.body;
-      console.log("e,", email);
-      console.log("updated", tasks);
       const update = {
         $set: {
           category: tasks.category,
+        },
+      };
+      const doc = await Tasks.findOneAndUpdate({ _id: tasks._id }, update);
+      res.send(doc);
+    });
+    // ? editTask
+    app.put("/editTask", async (req, res) => {
+      const tasks = req.body;
+      console.log(tasks);
+      const update = {
+        $set: {
+          title: tasks.title,
+          description: tasks.description,
+          deadline: tasks.deadline,
+          priority: tasks.priority,
         },
       };
       const doc = await Tasks.findOneAndUpdate({ _id: tasks._id }, update);
